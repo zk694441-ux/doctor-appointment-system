@@ -1,0 +1,112 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  email     String   @unique
+  password  String
+  role      String   @default("doctor")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  doctor    doctors? @relation("UserDoctor")
+}
+
+model doctors {
+  id                String                @id @default(uuid())
+  full_name         String
+  phone             String
+  bio               String?
+  yearsOfExperience Int?
+  profilePic        String?
+  user_id           String                @unique
+  specialization    String
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+  availabilities    doctor_availability[]
+  doctor_locations  doctor_location[]
+  user              users                 @relation("UserDoctor", fields: [user_id], references: [id])
+}
+
+model locations {
+  id               String                @id @default(uuid())
+  name             String
+  address          String
+  city             String
+  state            String
+  country          String
+  postalCode       String
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+  availabilities   doctor_availability[]
+  doctor_locations doctor_location[]
+}
+
+model doctor_location {
+  doctorId   String
+  locationId String
+  doctor     doctors   @relation(fields: [doctorId], references: [id])
+  location   locations @relation(fields: [locationId], references: [id])
+
+  @@id([doctorId, locationId])
+}
+
+model doctor_availability {
+  doctorId   String
+  locationId String
+  dayOfWeek  DayOfWeek
+  doctor     doctors            @relation(fields: [doctorId], references: [id])
+  location   locations          @relation(fields: [locationId], references: [id])
+  time_slots doctor_time_slot[]
+
+  @@id([doctorId, locationId, dayOfWeek])
+}
+
+model doctor_time_slot {
+  id           String              @id @default(uuid())
+  doctorId     String
+  locationId   String
+  dayOfWeek    DayOfWeek
+  endTime      String
+  maxPatients  Int
+  startTime    String
+  availability doctor_availability @relation(fields: [doctorId, locationId, dayOfWeek], references: [doctorId, locationId, dayOfWeek])
+  bookings      booking[]
+}
+
+model patient {
+  id        String   @id @default(uuid())
+  full_name String
+  email     String   @unique
+  password  String
+  phone     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  bookings  booking[]
+}
+
+model booking {
+  id              String          @id @default(uuid())
+  patientId       String
+  doctorTimeSlotId String
+  createdAt       DateTime        @default(now())
+  date            DateTime        // Date of the appointment (YYYY-MM-DD)
+  patient         patient         @relation(fields: [patientId], references: [id])
+  doctor_time_slot doctor_time_slot @relation(fields: [doctorTimeSlotId], references: [id])
+}
+
+enum DayOfWeek {
+  Monday
+  Tuesday
+  Wednesday
+  Thursday
+  Friday
+  Saturday
+  Sunday
+}

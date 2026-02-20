@@ -1,0 +1,16 @@
+{
+  "name": "@schedula/frontend",
+  "version": "0.0.1",
+  "private": true,
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^7.1.0",
+    "@mui/material": "^7.1.0",
+    "@mui/x-date-pickers": "^8.5.0",
+    "next": "~15.2.4",
+    "react": "19.0.0",
+    "react-datepicker": "^8.4.0",
+    "react-dom": "19.0.0"
+  }
+}

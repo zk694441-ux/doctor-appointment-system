@@ -1,0 +1,26 @@
+services:
+  - type: web
+    name: schedula-backend
+    env: node
+    plan: free
+    buildCommand: npm install && npx nx build backend --prod
+    startCommand: node dist/apps/backend/main.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+
+  - type: web
+    name: schedula-frontend
+    env: node
+    plan: free
+    buildCommand: npm install && npx nx build frontend --prod
+    startCommand: node dist/apps/frontend/server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_URL
+        value: https://schedula-backend.onrender.com
+    dependencies:
+      - name: schedula-backend
